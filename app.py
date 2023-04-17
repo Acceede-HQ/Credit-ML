@@ -24,8 +24,8 @@ def api_key_auth(api_key: str = Depends(oauth2_scheme)):
         )
 
 app = FastAPI()
-import nest_asyncio
-nest_asyncio.apply()
+#import nest_asyncio
+#nest_asyncio.apply()
 
 
 
