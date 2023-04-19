@@ -33,7 +33,7 @@ app = FastAPI()
 def display_analysis(input_data:FinancialStatement):
     account_id=input_data.account_id
     #user_id = input_data.user_id
-    loan_reference = input_data.loanReference
+    loan_reference = input_data.loan_reference
     print(loan_reference)
     print(account_id)
     try:
