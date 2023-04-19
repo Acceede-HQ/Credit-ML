@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class FinancialStatement(BaseModel):
     account_id: str
     # user: str
-    loanReference: str
+    loan_reference: str
     # account: dict
     # choose_wards: list
     # approved_wards: list
