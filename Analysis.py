@@ -109,7 +109,7 @@ def spend_analysis(data):
             'web_spend':web_spend,
             'pos_spend':pos_spend,
             'mobile_spend': mobile_spend,
-            'spend on transfer': spend_on_transfer,
+            'spend_on_transfer': spend_on_transfer,
             'bills':bills,
             'entertainment':entertainment,
             'savings_investments': savings_investments,
