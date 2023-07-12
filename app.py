@@ -13,6 +13,7 @@ api_keys = [
    "MLS-PASS","asd"
 ]  # This is encrypted in the database
 BASE_URL = "https://staging-s55s.onrender.com"
+BASE_URL2 = "https://acceedeapi.herokuapp.com"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # use token authentication
 
 
@@ -69,18 +70,25 @@ def display_analysis(input_data:FinancialStatement):
             headers = {'content-type': 'application/json',
                        "mls-access-token": "MLS_ACCESS_TOKEN"
                        }
-            url = BASE_URL + '/loans/mls/'+ loan_reference
+            url1 = BASE_URL + '/loans/mls/'+ loan_reference
+            url2 = BASE_URL2 + '/loans/mls/'+ loan_reference
             print(final_resp)
             res = json.dumps(final_resp, default=Analysis.type_converter,
                              allow_nan = True)
             res = json.loads(res)
             #print("hey")
-            response = requests.put(url, 
+            response = requests.put(url1, 
                                     data = json.dumps(final_resp, default=Analysis.type_converter,
                                                      allow_nan = True),
                                     headers = headers
                                     )
-            print("response is ", response.status_code)
+            response1 = requests.put(url2, 
+                        data = json.dumps(final_resp, default=Analysis.type_converter,
+                                            allow_nan = True),
+                        headers = headers
+                        )
+            print("staging response is ", response.status_code)
+            print("production response is ", response1.status_code)
             #print("Pass")
             #print("the response content is: ", response.text)
         
