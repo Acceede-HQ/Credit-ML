@@ -5,19 +5,15 @@ import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import re
+from datetime import datetime, timedelta
 
-def get_date():
-    end_date = datetime.datetime.now().strftime("%d-%m-%Y")
-    end_month = datetime.datetime.now().strftime("%m")
-    end_day = datetime.datetime.now().strftime("%d")
-    end_year = datetime.datetime.now().strftime("%Y")
-    start_year = int(end_year) - 1
-    start_date = datetime.datetime(int(start_year), int(end_month), int(end_day))
-    start_date = start_date.strftime("%d-%m-%Y")
+def get_transaction_date_range():
+    current_date = datetime.now()
+    end_date = current_date.strftime("%d-%m-%Y")
+    start_date = (current_date - timedelta(days=365)).strftime("%d-%m-%Y")
     return start_date, end_date
 
-start = get_date()[0]
-end = get_date()[1]
+start_date, end_date = get_transaction_date_range()
 
 
 def get_transactions(account_id):
