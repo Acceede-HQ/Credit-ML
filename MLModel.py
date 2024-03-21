@@ -5,8 +5,17 @@ import pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import re
+from datetime import datetime, timedelta
+
+def get_transaction_date_range():
+    current_date = datetime.now()
+    end_date = current_date.strftime("%d-%m-%Y")
+    start_date = (current_date - timedelta(days=365)).strftime("%d-%m-%Y")
+    return start_date, end_date
+
 def get_transactions(account_id):
-    url = f"https://api.withmono.com/accounts/{account_id}/transactions?paginate=false"
+    start_date, end_date = get_transaction_date_range()
+    url = f"https://api.withmono.com/accounts/{account_id}/transactions?paginate=false&start_date&end_date"
     headers = {"accept": "application/json",
           "mono-sec-key": "live_sk_CA7jLNrlfqEDOy30yLZi"}
     response = requests.get(url, headers=headers)
