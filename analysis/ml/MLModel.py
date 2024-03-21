@@ -2,9 +2,6 @@ import pandas as pd
 import numpy as np
 import requests
 import pickle
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
-import re
 from datetime import datetime, timedelta
 
 def get_transaction_date_range():

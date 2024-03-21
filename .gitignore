@@ -1,0 +1,14 @@
+.ipynb_checkpoints
+.DS_Store
+*.pyc
+.DS_Store
+.cache/
+__pycache__/
+.ipynb_checkpoints/
+.vscode/
+.pytest_cache/
+
+
+# Local tests
+*.ipynb
+transactions
