@@ -12,7 +12,7 @@ def get_transaction_date_range():
 
 def get_transactions(account_id):
     start_date, end_date = get_transaction_date_range()
-    url = f"https://api.withmono.com/accounts/{account_id}/transactions?paginate=false&start_date&end_date"
+    url = f"https://api.withmono.com/accounts/{account_id}/transactions?paginate=false&{start_date}&{end_date}"
     headers = {"accept": "application/json",
           "mono-sec-key": "live_sk_CA7jLNrlfqEDOy30yLZi"}
     response = requests.get(url, headers=headers)
