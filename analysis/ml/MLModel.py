@@ -25,8 +25,11 @@ def remove_one_two(x):
   x = ' '.join(x)
   return x
 
-def preprocess(df):
-  data = df.copy()
+def preprocess(data):
+  data = pd.DataFrame(data)
+  data = data.replace(np.nan, 0)
+  data['balance'] = data['balance']/100
+  data['amount'] = data['amount']/100
   data['text'] = data['narration'].copy()
   stop = ["to"]
   data["text"] = data["text"].str.lower()
