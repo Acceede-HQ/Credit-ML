@@ -43,7 +43,6 @@ def preprocess(data):
   #data['text'] = data['text'].str.slice(start=6)
   documents = data['text'].values.astype('U')
   vectorizer = get_vectorizer_model()
-  print(documents)
   features = vectorizer.transform(documents)
   return features, data
 
