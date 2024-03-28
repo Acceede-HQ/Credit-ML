@@ -191,3 +191,25 @@ def combined_analysis(data):
         }
         
     return resp
+
+def get_income(data):
+    recurring_amount_list = []
+    credit_rows = data['type'] == 'credit'
+    credit_transactions = data[credit_rows]
+
+    for _, rows in credit_transactions.iterrows():
+        # group credit transactions by category and amount, then count occurence
+        credits_by_cat_amount = credit_transactions.groupby(['category', 'amount']).size().reset_index(name='count')
+
+        # sort categories by count in descending order 
+        sorted_cat_amount = credits_by_cat_amount.sort_values(by='count', ascending = False)
+
+        # top 3 category and amount
+        top_cat_amount = sorted_cat_amount.head(3)
+
+    recurring_amount_list.append(top_cat_amount)
+
+    return recurring_amount_list
+
+
+
