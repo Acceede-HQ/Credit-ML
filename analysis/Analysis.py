@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import math
 import datetime
+from collections import Counter
+
 def type_converter(obj):
     if isinstance(obj, np.integer):
         return int(obj)
@@ -192,21 +194,28 @@ def combined_analysis(data):
         
     return resp
 
+
 def income_analysis(data):
-    top_category_amount_list = []
     credit_rows = data_2['type'] == 'credit'
     credit_transactions = data_2[credit_rows]
 
-    for _,  rows in credit_transactions.iterrows():
-        # group credit transactions by category and amount, then count occurrence
-        credit_counts_by_category_amount = credit_transactions.groupby(['category', 'amount']).size().reset_index(name='count')
+    # extracting credit amounts 
+    amount_list = []
+    for i in credit_transactions.iterrows():
+        amount_list.append(i[1]['amount'])
 
-        # sort categories by count in descending order
-        sorted_category_amount = credit_counts_by_category_amount.sort_values(by='count', ascending=False)
+    # count occurence of amounts in list 
+    amount_counts = Counter(amount_list)
 
-        #top 3 category and amount
-        top_category_amount = sorted_category_amount.head(3)
+    # top 3 reocurring payments 
+    top_three_credits = amount_counts.most_common(3)
 
-    top_category_amount_list.append(top_category_amount)
-
-    return top_category_amount_list
+    top_3_credits_list = []
+    # print rows with this top credit payments 
+    for amount, count in top_three_credits:
+        for index, row in credit_transactions.iterrows():
+            if row['amount'] == amount:
+              # put row in list 
+              top_3_credits_list.append(row)
+    
+    return top_3_credits_list
