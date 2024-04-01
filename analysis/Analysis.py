@@ -193,29 +193,20 @@ def combined_analysis(data):
     return resp
 
 def income_analysis(data):
-    # Filter the DataFrame to include only credit transactions
-    credit_transactions = data['type'] == 'credit'
-    credit_transactions = data[credit_transactions]
-
     top_category_amount_list = []
-    for _, row in credit_transactions.iterrows():
-      category = row['category']
-      amount = row['amount']
+    credit_rows = data_2['type'] == 'credit'
+    credit_transactions = data_2[credit_rows]
 
-      # group credit transactions by category and amount, then count occurrence
-      credit_counts_by_category_amount = credit_transactions.groupby([category, amount]).size().reset_index(name='count')
+    for _,  rows in credit_transactions.iterrows():
+        # group credit transactions by category and amount, then count occurrence
+        credit_counts_by_category_amount = credit_transactions.groupby(['category', 'amount']).size().reset_index(name='count')
 
-      # sort categories by count in descending order
-      sorted_category_amount = credit_counts_by_category_amount.sort_values(by='count', ascending=False)
+        # sort categories by count in descending order
+        sorted_category_amount = credit_counts_by_category_amount.sort_values(by='count', ascending=False)
 
-      # top 3 category and amount
-      top_category_amount = sorted_category_amount.head(3)
+        #top 3 category and amount
+        top_category_amount = sorted_category_amount.head(3)
 
-   # Filter original data and store in a list
-    top_category_amount_list = []
-    for _, row in top_category_amount.iterrows():
-      top_category_data = data[(data['category'] == category) & (data['amount'] == amount)]
-      top_category_amount_list.append(top_category_data)
+    top_category_amount_list.append(top_category_amount)
 
-    # Return the list of data
     return top_category_amount_list
