@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
-import requests
+import os, requests
 import pickle
+<<<<<<< HEAD:MLModel.py
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 import re
@@ -26,15 +27,19 @@ def get_transactions(account_id):
     resp['balance'] = resp['balance']/100
     resp['amount'] = resp['amount']/100
     return resp
+=======
+>>>>>>> 53f3f18439aac1e6ba761b3640a8d2389b75981b:analysis/ml/MLModel.py
 
 def get_vectorizer_model():
-    pickle_in = open("vectorizer.sav","rb")
+    filepath = os.path.join('models','vectorizer.sav')
+    pickle_in = open(filepath,"rb")
     vectorizer_model =pickle.load(pickle_in)
     print(vectorizer_model)
     return vectorizer_model
 
 def get_ml_model():
-    pickle_in = open("k_means_model.sav","rb")
+    modelpath = os.path.join('models','k_means_model.sav')
+    pickle_in = open(modelpath,"rb")
     k_means_model =pickle.load(pickle_in)
     return k_means_model
     
