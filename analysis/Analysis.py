@@ -195,27 +195,24 @@ def combined_analysis(data):
     return resp
 
 
+
 def income_analysis(data):
     credit_rows = data_2['type'] == 'credit'
     credit_transactions = data_2[credit_rows]
 
-    # extracting credit amounts 
-    amount_list = []
-    for i in credit_transactions.iterrows():
-        amount_list.append(i[1]['amount'])
+    # extracting credit amounts
+    credit_amounts = credit_transactions['amount']
 
-    # count occurence of amounts in list 
-    amount_counts = Counter(amount_list)
+    # count occurence of amounts 
+    amount_counts = Counter(credit_amounts)
 
-    # top 3 reocurring payments 
-    top_three_credits = amount_counts.most_common(3)
+    # list of top 3 amounts and their counts --(amount, count)
+    top_three_amounts = amount_counts.most_common(3)
 
-    top_3_credits_list = []
-    # print rows with this top credit payments 
-    for amount, count in top_three_credits:
-        for index, row in credit_transactions.iterrows():
-            if row['amount'] == amount:
-              # put row in list 
-              top_3_credits_list.append(row)
-    
-    return top_3_credits_list
+    # list of top 3 amounts
+    top_three_credits = [amount for amount, count in top_three_amounts]
+
+    # top 3 credit transactions
+    top_3_credits_transactions = credit_transactions[credit_transactions['amount'].isin(top_three_credits)]  
+
+    return top_3_credits_transactions 
