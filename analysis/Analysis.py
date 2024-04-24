@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import math
 import datetime
+from collections import Counter
+
 def type_converter(obj):
     if isinstance(obj, np.integer):
         return int(obj)
@@ -191,3 +193,26 @@ def combined_analysis(data):
         }
         
     return resp
+
+
+
+def income_analysis(data):
+    credit_rows = data_2['type'] == 'credit'
+    credit_transactions = data_2[credit_rows]
+
+    # extracting credit amounts
+    credit_amounts = credit_transactions['amount']
+
+    # count occurence of amounts 
+    amount_counts = Counter(credit_amounts)
+
+    # list of top 3 amounts and their counts --(amount, count)
+    top_three_amounts = amount_counts.most_common(3)
+
+    # list of top 3 amounts
+    top_three_credits = [amount for amount, count in top_three_amounts]
+
+    # top 3 credit transactions
+    top_3_credits_transactions = credit_transactions[credit_transactions['amount'].isin(top_three_credits)]  
+
+    return top_3_credits_transactions 
