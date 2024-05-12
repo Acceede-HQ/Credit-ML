@@ -222,137 +222,92 @@ def income_analysis(data):
     return top_3_credits_transactions 
 
 
+def income_analysis(data):
+    dict_statistics = {}
+    credit_rows = data['type'] == 'credit'
+    credit_transactions = data[credit_rows]
 
-def salary_amount(data):
-  # filter credit transactions
-  credit_rows = data['type'] == 'credit'
-  credit_transactions = data[credit_rows]
+    # extracting credit amounts
+    credit_amounts = credit_transactions['amount']
 
-  # extracting credit amounts 
-  credit_amounts = credit_transactions['amount']
+    # count occurence of amounts
+    amount_counts = Counter(credit_amounts)
 
-  # count occurence
-  amounts = Counter(credit_amounts)
+    # list of top 5 amounts and their counts --(amount, count)
+    top_5 = amount_counts.most_common(5)
 
-  # list of top 3 amounts and their counts 
-  top_5 = amounts.most_common(5)
+    # list of top 5 amounts
+    top_five_credits = [amount for amount, count in top_5]
 
-  # get salary amount
-  salary_amount = max(amount for amount,_ in top_5)
+    # top 5 credit transactions
+    top_5_credits_transactions = credit_transactions[credit_transactions['amount'].isin(top_five_credits)]
 
-  # print salary amount
-  return salary_amount
+    # get salary amount #1
+    salary_amount = max(amount for amount,_ in top_5)
+    #append to dictionary
+    dict_statistics['salary_amount'] = salary_amount
 
+    # get last salary date #2
+    salary_transactions = top_5_credits_transactions[top_5_credits_transactions['amount'] == salary_amount]
+    salary_dates = pd.to_datetime(salary_transactions['date'])
+    salary_dates_sorted = salary_dates.sort_values(ascending=False)
+    last_salary_date = salary_dates_sorted.iloc[0].date()
+    dict_statistics['last_salary_date'] = last_salary_date.isoformat()
 
-def Last_Salary_Date(data):
-  income = income_analysis(data)
-  salary_transactions = income[income['amount'] == salary_amount(data)]
-  salary_dates = pd.to_datetime(salary_transactions['date'])
-  salary_dates_sorted = salary_dates.sort_values(ascending=False)
-  #print(salary_dates_sorted)
+    # get the average of other incomes #3
+    other_income = top_5_credits_transactions[top_5_credits_transactions['amount'] != salary_amount]  #top_5_credits_transactions[top_5_credits_transactions['amount'] != salary_amount]
+    average_other_income = other_income['amount'].mean()
+    dict_statistics['average_other_income'] = average_other_income
 
-  last_salary_date = salary_dates_sorted.iloc[0].date()
+    # get salary frequency #4
+    salary_month_year = salary_dates.dt.to_period('M') # month_year of the transactions
+    salary_counts = Counter(salary_month_year)
+    max_count = max(salary_counts.values())
+    if max_count == 1:
+      dict_statistics['salary_frequency'] = '1'
+    elif max_count > 1:
+      dict_statistics['salary_frequency'] = '>1'
+    else:
+      dict_statistics['salary_frequency'] = None
 
-  return last_salary_date.isoformat()
+    # get number of salary payments #5
+    Number_salary_payments = len(salary_transactions)
+    dict_statistics['Number_salary_payments'] = Number_salary_payments
 
+    # get number other payments #6
+    Number_other_payments = len(other_income)
+    dict_statistics['Number_other_payments'] = Number_other_payments
 
-def Average_Other_Income(data):
-  income = income_analysis(data)
-  other_income = income[income['amount'] != salary_amount(data)]
-  average_other_income = other_income['amount'].mean()
-  return average_other_income
+    # get average salary #7
+    average_salary = top_5_credits_transactions['amount'].mean()
+    dict_statistics['average_salary'] = average_salary
 
+    # get expected salary day #8
+    salary_days = salary_dates.dt.day
+    mode_salary_days = mode(salary_days) #most common salary day
+    mode_value = mode_salary_days.mode
+    mode_count = mode_salary_days.count
 
-def Salary_Frequency(data):
-  '''
-  "1" if maximum salary count in a month == 1, 
-  ">1" if maximum salary count in a month > 1, 
-  else null
-  '''
-  income = income_analysis(data)
-  salary_transactions = income[income['amount'] == salary_amount(data)]
-  salary_dates = pd.to_datetime(salary_transactions['date'])
-  salary_month_year = salary_dates.dt.to_period('M') # month_year of the transactions
-  salary_counts = Counter(salary_month_year)
-  max_count = max(salary_counts.values())
-  if max_count == 1:
-    return '1'
-  elif max_count > 1:
-    return '>1'
-  else:
-    return None
+    if mode_count == 1:
+      # if mode occurs only once, return the 75th percentile
+      salary_day_75th_percentile = np.percentile(salary_days, 75)
+      dict_statistics['expected_salary_day'] = salary_day_75th_percentile
 
+    else:
+      # if mode occurs more than once, return "LastSalaryYear-lastSalaryMonth + 1 - lastsalaryday"
+      last_salary_year = last_salary_date.isoformat().split('-')[0]
+      last_salary_month = last_salary_date.isoformat().split('-')[1]
+      expected_salary_day = datetime.date(int(last_salary_year), int(last_salary_month) + 1,last_salary_date.day)
+      dict_statistics['expected_salary_day'] = expected_salary_day.isoformat()
 
+    # confirm if a salary earner #9
+    if Number_salary_payments > 1:
+      dict_statistics['salary_earner'] = 'Yes'
+    else:
+      dict_statistics['salary_earner'] = 'No'
 
-def Number_Salary_Payments(data):
-  income = income_analysis(data)
-  salary_transactions = income[income['amount'] == salary_amount(data)]
-  No_salary_payments = len(salary_transactions)
-  return No_salary_payments
+    # get median income #10
+    median_income = top_5_credits_transactions['amount'].median()
+    dict_statistics['median_income'] = median_income
 
-
-
-def Number_Other_Payments(data):
-  income = income_analysis(data)
-  other_income = income[income['amount'] != salary_amount(data)]
-  No_other_payments = len(other_income)
-  return No_other_payments
-
-
-def Average_Salary(data):
-  income = income_analysis(data)
-  salary_transactions = income[income['amount'] == salary_amount(data)]
-  average_salary = salary_transactions['amount'].mean()
-  return average_salary
-
-
-
-def Expected_Salary_Day(data):
-  '''
-  Mode of all salary days. 
-  If the mode is 1, it returns the 75th percentile the salary days
-  '''
-  income = income_analysis(data)
-  salary_transactions = income[income['amount'] == salary_amount(data)]
-  salary_dates = pd.to_datetime(salary_transactions['date'])
-  salary_days = salary_dates.dt.day
-
-  mode_salary_days = mode(salary_days) #most common salary day
-
-  mode_value = mode_salary_days.mode
-  mode_count = mode_salary_days.count
-
-  if mode_count == 1:
-    # if mode occurs only once, return the 75th percentile
-    salary_day_75th_percentile = np.percentile(salary_days, 75)
-    return salary_day_75th_percentile
-
-  else:
-    # if mode occurs more than once, return "LastSalaryYear-lastSalaryMonth + 1 - lastsalaryday"
-    last_salary_date = Last_Salary_Date(data)
-    last_salary_date = pd.to_datetime(last_salary_date)
-    last_salary_date = pd.to_datetime(last_salary_date)
-    last_salary_year = last_salary_date.year
-    last_salary_month = last_salary_date.month + 1
-    expected_salary_day = datetime.date(last_salary_year, last_salary_month,last_salary_date.day)
-    return expected_salary_day.isoformat()
-
-
-
-def Salary_Earner(data):
-  '''
-  "Yes" if number of salary payments > 1, else "No"
-  '''
-  income = income_analysis(data)
-  salary_transactions = income[income['amount'] == salary_amount(data)]
-  No_salary_payments = len(salary_transactions)
-  if No_salary_payments > 1:
-    return 'Yes'
-  else:
-    return 'No'
-
-
-def Median_Income(data):
-  income = income_analysis(data)
-  median_income = income['amount'].median()
-  return median_income
+    return dict_statistics
