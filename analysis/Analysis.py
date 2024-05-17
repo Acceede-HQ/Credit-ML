@@ -198,30 +198,6 @@ def combined_analysis(data):
         
     return resp
 
-
-
-def income_analysis(data):
-    credit_rows = data['type'] == 'credit'
-    credit_transactions = data[credit_rows]
-
-    # extracting credit amounts
-    credit_amounts = credit_transactions['amount']
-
-    # count occurence of amounts 
-    amount_counts = Counter(credit_amounts)
-
-    # list of top 3 amounts and their counts --(amount, count)
-    top_three_amounts = amount_counts.most_common(3)
-
-    # list of top 3 amounts
-    top_three_credits = [amount for amount, count in top_three_amounts]
-
-    # top 3 credit transactions
-    top_3_credits_transactions = credit_transactions[credit_transactions['amount'].isin(top_three_credits)]  
-
-    return top_3_credits_transactions 
-
-
 def income_analysis(data):
     dict_statistics = {}
     credit_rows = data['type'] == 'credit'
