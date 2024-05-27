@@ -42,7 +42,7 @@ def display_analysis(input_data:FinancialStatementRequestVM):
         
         transactions = get_transactions(account_id)
         if not transactions:
-            return api_response(message="No transactions found for this account 😕")
+            return api_response(message="Could not fetch transactions for this account 😕")
 
         analysis_result = analyze(transactions)
 
@@ -73,6 +73,9 @@ def get_transactions(account_id: str):
     url = f"{MONO_BASE_URL}/{account_id}/transactions?paginate=false&{start_date}&{end_date}"
     headers = {"accept": "application/json", "mono-sec-key": env.get(MONO_SECRET_KEY)}
     response = requests.get(url, headers=headers)
+    if response.status_code != 200 or 'data' not in response.json():
+        logger.error(f"Error fetching transactions from mono: {response.json()}")
+        return None
     response = response.json()['data']
     return response
 

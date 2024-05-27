@@ -56,6 +56,10 @@ def cashflow_analysis(data):
     return cash_flow
 
 def income_analysis(data):
+    import income_analysis as ia
+    return ia.analyze(data)
+
+def income_analysis_old(data):
     salary_earner = False
     income = None
     if 'salary' in list(data.category):
