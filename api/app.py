@@ -70,7 +70,7 @@ def analyze(transactions):
 
 def get_transactions(account_id: str):
     start_date, end_date = get_transaction_date_range()
-    url = f"{MONO_BASE_URL}/v2/{account_id}/transactions?paginate=false&{start_date}&{end_date}"
+    url = f"{MONO_BASE_URL}/{account_id}/transactions?paginate=false&{start_date}&{end_date}"
     headers = {"accept": "application/json", "mono-sec-key": env.get(MONO_SECRET_KEY)}
     response = requests.get(url, headers=headers)
     if response.status_code != 200 or 'data' not in response.json():
