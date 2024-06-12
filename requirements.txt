@@ -1,7 +1,7 @@
 annotated-types==0.6.0
 click==8.1.7
 fastapi==0.110.0
-gunicorn==19.9.0
+gunicorn>=22.0.0
 h11==0.14.0
 joblib==1.4.2
 numpy==1.26.4
@@ -11,11 +11,10 @@ pydantic_core==2.16.3
 pyee==6.0.0
 PyQt5==5.15.10
 python-dotenv==1.0.1
-python-multipart==0.0.5
+python-multipart>=0.0.7
 scikit-learn==1.5.0
 scipy==1.13.1
 setuptools==68.2.2
-slackers==1.0.3
 starlette==0.36.3
 threadpoolctl==3.5.0
 tzdata==2024.1
