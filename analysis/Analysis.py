@@ -96,37 +96,49 @@ def income_analysis_old(data):
     return income
 
 def spend_analysis(data):
-    #recurring_expenses = list(pd.DataFrame(data.groupby('category')['category'].count().sort_values(ascending=False)).head(1).to_dict()['category'].keys())[0]
-    #recurring_expenses_frequency = list(pd.DataFrame(data.groupby('category')['category'].count().sort_values(ascending=False)).head(1).to_dict()['category'].values())[0]
-    #average_recurring_expense = float(data[data.category == recurring_expenses]['amount'].mean())
-    atm_spend = round(float(data[data.category == 'atm_withdrawal']['amount'].sum()),2)
-    web_spend = round(float(data[data.category == 'online_transactions']['amount'].sum()),2)
-    pos_spend = round(float(data[data.category == 'offline_transactions']['amount'].sum()),2)
-    mobile_spend = round(float(data[data.category == 'phone_and_internet']['amount'].sum()),2)
-    spend_on_transfer = round(float(data[(data.category == 'transfer') &(data.type == 'debit' )]['amount'].sum()),2)
-    
-    bills = round(float(data[data.category == 'bills_fees']['amount'].sum()),2)
-    entertainment = round(float(data[(data.category == 'events') | (data.category == 'gadget') | (data.category == 'food')]['amount'].sum()),2)
-    savings_investments = round(float(data[data.category == 'investment']['amount'].sum()),2)
-    bank_charges = round(float(data[(data.category == 'bank_charges') | (data.category =="atm_withdrawal_charges")]['amount'].sum()),2)
-    miscellaneous = round(float(data[(data.category == 'miscellaneous')|(data.category == 'others')]['amount'].sum()),2)
-    
-    spend = {
-            #'average_recurring_expense':average_recurring_expense,
-            #'recurring_expenses_frequency': recurring_expenses_frequency,
-            #'recurring_expenses': recurring_expenses,
-            'atm_spend':atm_spend,
-            'web_spend':web_spend,
-            'pos_spend':pos_spend,
-            'mobile_spend': mobile_spend,
-            'spend_on_transfer': spend_on_transfer,
-            'bills':bills,
-            'entertainment':entertainment,
-            'savings_investments': savings_investments,
-            'bank_charges':bank_charges,
-            'miscellaneous': miscellaneous
-            }
-    return spend
+  debit_rows = data[data.type == "debit"]
+  recurring_expense =list((pd.DataFrame(debit_rows.groupby('category')['category'].count().sort_values(ascending=False))).head(1).to_dict()['category'].keys())[0]
+  recurring_expense_frequency = list((pd.DataFrame(debit_rows.groupby('category')['category'].count().sort_values(ascending=False))).head(1).to_dict()['category'].values())[0]
+  average_recurring_expense = round(float(debit_rows[debit_rows.category == recurring_expense]['amount'].mean()),2)
+  atm_spend = round(float(data[(data.category == "cash_withdrawal") & (~data.narration.isin(["POS", "POS withdrawal"]))]["amount"].sum()), 2)
+
+  web_spend = round(float(data[data.category == "online_payments"]["amount"].sum()),2)
+  pos_spend = round(float(data[data.narration.isin(["POS", "POS withdrawal"])]["amount"].sum()), 2)
+
+  web_spend = round(float(data[data.category == "online_payments"]["amount"].sum()),2)
+  mobile_spend = round(float(data[data.category == "phone_internet"]["amount"].sum()),2)
+  spend_on_transfer = round(float(data[(data.category == "personal_transfer") & (data.type == "debit")]["amount"].sum()),2)
+  bills = round(float(data[data.category == "bills"]["amount"].sum()),2)
+
+  entertainment = round(float(data[data.category.isin(["food", "events", "gadgets"])]["amount"].sum()),2)
+
+  investment_payout = round(float(data[data.category == "investment_payout"]["amount"].sum()),2)
+  gambling = round(float(data[(data.category == "betting_deposit") | (data.category == "loan_repayments")]["amount"].sum()),2)
+  bank_charges = round(float(data[(data.category == "bank_charges")]["amount"].sum()),2)
+  miscellaneous = round(float(data[(data.category == "groceries") | (data.category == "personal_care") | (data.category == "health") | (data.category == "personal_care") |
+                  (data.category == "rent_maintanence") | (data.category == "education")| (data.category == "gifts_donations") ]["amount"].sum()),2)
+  unknown_debits = round(float(data[(data.type == "debit") & (data.category == "unknown")]["amount"].sum()),2)
+  other_outgoing_payments = round(float(data[(data.type == "debit") & (data.category == "other_outgoing_payments")]["amount"].sum()),2)
+
+  spend ={
+          'average_recurring_expense':average_recurring_expense,
+          'recurring_expense_frequency': recurring_expense_frequency,
+          'recurring_expense': recurring_expense,
+          'atm_spend':atm_spend,
+          'web_spend':web_spend,
+          'pos_spend':pos_spend,
+          'mobile_spend': mobile_spend,
+          'spend_on_transfer': spend_on_transfer,
+          'bills':bills,
+          'entertainment':entertainment,
+          'investment_payout': investment_payout,
+          'gambling':gambling,
+          'bank_charges':bank_charges,
+          'miscellaneous': miscellaneous,
+          'unknown_debits': unknown_debits,
+          'other_outgoing_payments': other_outgoing_payments
+  }
+  return spend
 
 def behavioral_analysis(data):
     total_credit_turnover = round(float(data[data.type == 'credit']['amount'].sum()),2)
