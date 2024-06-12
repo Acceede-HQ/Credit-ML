@@ -96,34 +96,44 @@ def income_analysis_old(data):
     return income
 
 def spend_analysis(data):
-  debit_rows = data[data.type == "debit"]
-  recurring_expense =list((pd.DataFrame(debit_rows.groupby('category')['category'].count().sort_values(ascending=False))).head(1).to_dict()['category'].keys())[0]
-  recurring_expense_frequency = list((pd.DataFrame(debit_rows.groupby('category')['category'].count().sort_values(ascending=False))).head(1).to_dict()['category'].values())[0]
-  average_recurring_expense = round(float(debit_rows[debit_rows.category == recurring_expense]['amount'].mean()),2)
-  atm_spend = round(float(data[(data.category == "cash_withdrawal") & (~data.narration.isin(["POS", "POS withdrawal"]))]["amount"].sum()), 2)
+  '''
+  Indicina: https://developers.indicina.co/docs/how-variables-are-calculated
+  The calculation suggestions was not fully implemented in this code 
+  '''
 
+  debit_rows = data_1[data_1.type == "debit"] 
+  recurring_expenses = debit_rows['category'].value_counts().head(3).index.tolist() #top 3 recurring expenses category returned as a list
+  recurring_expenses_frequency = sum(debit_rows['category'].value_counts().head(3).tolist()) #total frequency of the top 3 recurring expense categories 
+  total_reccuring_expenses = debit_rows[debit_rows["category"].isin(recurring_expenses)]['amount'].sum() #total amount of the top 3 recurring expense categories
+  average_recurring_expense = round(float(total_reccuring_expenses/recurring_expenses_frequency),2) #average recurring expense 
+
+  atm_spend = round(float(data[(data.category == "cash_withdrawal") & (~data.narration.isin(["POS", "POS withdrawal"]))]["amount"].sum()), 2) #cash withdrawal where the narration isn't POS or POS withdrawal
   web_spend = round(float(data[data.category == "online_payments"]["amount"].sum()),2)
-  pos_spend = round(float(data[data.narration.isin(["POS", "POS withdrawal"])]["amount"].sum()), 2)
+  pos_spend = round(float(data[data.narration.isin(["POS", "POS withdrawal"])]["amount"].sum()), 2) #No category with POS, just narration
 
   web_spend = round(float(data[data.category == "online_payments"]["amount"].sum()),2)
   mobile_spend = round(float(data[data.category == "phone_internet"]["amount"].sum()),2)
   spend_on_transfer = round(float(data[(data.category == "personal_transfer") & (data.type == "debit")]["amount"].sum()),2)
   bills = round(float(data[data.category == "bills"]["amount"].sum()),2)
 
-  entertainment = round(float(data[data.category.isin(["food", "events", "gadgets"])]["amount"].sum()),2)
+  entertainment = round(float(data[data.category.isin(["food", "events", "gadgets"])]["amount"].sum()),2) #categories with food,events,gadgets
 
-  investment_payout = round(float(data[data.category == "investment_payout"]["amount"].sum()),2)
-  gambling = round(float(data[(data.category == "betting_deposit") | (data.category == "loan_repayments")]["amount"].sum()),2)
+  investment_payout = round(float(data[data.category == "investment_payout"]["amount"].sum()),2) #this is a credit amount
+
+  gambling = round(float(data[(data.category == "betting_deposit") | (data.category == "loan_repayments")]["amount"].sum()),2) #betting deposit or loan repayment
+
   bank_charges = round(float(data[(data.category == "bank_charges")]["amount"].sum()),2)
+
   miscellaneous = round(float(data[(data.category == "groceries") | (data.category == "personal_care") | (data.category == "health") | (data.category == "personal_care") |
-                  (data.category == "rent_maintanence") | (data.category == "education")| (data.category == "gifts_donations") ]["amount"].sum()),2)
-  unknown_debits = round(float(data[(data.type == "debit") & (data.category == "unknown")]["amount"].sum()),2)
-  other_outgoing_payments = round(float(data[(data.type == "debit") & (data.category == "other_outgoing_payments")]["amount"].sum()),2)
+                  (data.category == "rent_maintanence") | (data.category == "education")| (data.category == "gifts_donations") ]["amount"].sum()),2) 
+  
+  unknown_debits = round(float(data[(data.type == "debit") & (data.category == "unknown")]["amount"].sum()),2)# most of the unknown debits are in entertainment category
+  other_outgoing_payments = round(float(data[(data.type == "debit") & (data.category == "other_outgoing_payments")]["amount"].sum()),2) #most of these are under spend_on_transfer
 
   spend ={
           'average_recurring_expense':average_recurring_expense,
-          'recurring_expense_frequency': recurring_expense_frequency,
-          'recurring_expense': recurring_expense,
+          'recurring_expense_frequency': recurring_expenses_frequency,
+          'recurring_expense': recurring_expenses,
           'atm_spend':atm_spend,
           'web_spend':web_spend,
           'pos_spend':pos_spend,
